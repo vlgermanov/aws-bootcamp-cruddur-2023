@@ -14,15 +14,19 @@
 
 ![image](../_docs/assets/week-0/lucid-conceptual-diagram.png)
 
+[Link to LucidChart Conceptual Diagram](https://lucid.app/lucidchart/a37e2fce-4864-4c5d-9e69-ec2eaff357c1/edit?viewport_loc=-11%2C27%2C2219%2C1052%2C0_0&invitationId=inv_2007f680-c186-405e-a351-04486abe17ba)
+
 6. Recreate Logical Architectural Diagram in Lucid Charts
 
 ![image](../_docs/assets/week-0/lucid-logical-diagram.png)
+
+[Link to LucidChart Logical Diagram](https://lucid.app/lucidchart/042d43a9-42ec-4723-9595-a78a838a6feb/edit?viewport_loc=-89%2C-4%2C2219%2C1052%2C0_0&invitationId=inv_17a465f1-3d33-4bb7-8356-62261dd920a5)
 
 7. Created an Admin User via IAM
   
    * Create an `Admins` Group with Policy: `AdministratorAccess`
 
-   * Create a User and add it to the Admin Group
+   * Create a User and add it to the `Admins Group`
 
    * Add MFA for root user.
 
@@ -59,7 +63,7 @@
 
    * Installed manually extra linux packages
 
-   * To automate the installation tasks I extended .gitpod.yml configuration to add extra tasks to installing aws cli and linux packages
+   * To automate the installation tasks I extended `.gitpod.yml` configuration to add extra tasks to installing aws cli and linux packages
 
 ```bash
 tasks:
