@@ -36,7 +36,7 @@
 
 ![image](../_docs/assets/week-0/user-groups.png)
 
-![image](../_docs/assets/week-0/user-group-policies.png)
+![image](../_docs/assets/week-0/user-groups-policies.png)
 
 *Problems during this task*
 - by default IAM Users with `AdministratorAccess` policy doesn't have access to Billing data. Solution to this problem is to create a `custom policy` to allow access to billing data. I used [this acticle](https://docs.aws.amazon.com/IAM/latest/UserGuide/tutorial_billing.html?icmpid=docs_iam_console#tutorial-billing-step1) to create `custom policy` and attach it to the `Admins` group. 
