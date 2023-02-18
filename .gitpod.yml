@@ -8,6 +8,8 @@ tasks:
       unzip awscliv2.zip
       sudo ./aws/install
       cd $THEIA_WORKSPACE_ROOT
+  - name: Install required linux packages
+    command: sudo apt-get install gettext-base -y
 
 vscode:
   extensions:
