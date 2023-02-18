@@ -12,7 +12,7 @@
         ]
     },
     "CostTypes": {
-        "IncludeCredit": true,
+        "IncludeCredit": false,
         "IncludeDiscount": true,
         "IncludeOtherSubscription": true,
         "IncludeRecurring": true,
