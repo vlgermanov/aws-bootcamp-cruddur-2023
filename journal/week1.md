@@ -227,7 +227,7 @@ Deleted: sha256:3943af3b0cbde0bb8da4e4eb5e81efefe52669e9233eeff0ba820ac838121f65
 
 #### 1.2.3. Docker-compose
 
-- Created a [docker-compose.yml](../docker-compose.yml)
+- Created a [docker-compose.yml](../docker-compose.yml) file
 
 ```yaml
 version: "3.8"
@@ -380,6 +380,48 @@ Add a new route:
 ![image](../_docs/assets/week-1/notifications-endpoint.png)
 
 ### 1.4. Run locally DB containers
+
+#### 1.4.1. DynamoDB Local Container
+
+- Modify the [docker-compose.yml](../docker-compose.yml) file to add the following service
+
+```yaml
+services:
+  dynamodb-local:
+    # https://stackoverflow.com/questions/67533058/persist-local-dynamodb-data-in-volumes-lack-permission-unable-to-open-databa
+    # We needed to add user:root to get this working.
+    user: root
+    command: "-jar DynamoDBLocal.jar -sharedDb -dbPath ./data"
+    image: "amazon/dynamodb-local:latest"
+    container_name: dynamodb-local
+    ports:
+      - "8000:8000"
+    volumes:
+      - "./docker/dynamodb:/home/dynamodblocal/data"
+    working_dir: /home/dynamodblocal
+```
+
+- Modify the [docker-compose.yml](../docker-compose.yml) file to add the following service
+
+```yaml
+volumes:
+  dynamodb:
+    driver: local
+```
+
+- Testing connectivity to DynamoDB Local container
+
+```shell
+gitpod /workspace/aws-bootcamp-cruddur-2023 (main) $ docker-compose ps
+NAME                IMAGE                          COMMAND                  SERVICE             CREATED             STATUS              PORTS
+dynamodb-local      amazon/dynamodb-local:latest   "java -jar DynamoDBL…"   dynamodb-local      6 minutes ago       Up 6 minutes        0.0.0.0:8000->8000/tcp, :::8000->8000/tcp
+gitpod /workspace/aws-bootcamp-cruddur-2023 (main) $ aws dynamodb list-tables --endpoint-url http://localhost:8000
+{
+    "TableNames": []
+}
+```
+
+![image](../_docs/assets/week-1/dynamodb-local.png)
 
 ## 2. Stretched Homework
 
