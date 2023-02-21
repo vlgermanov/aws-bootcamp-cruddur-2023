@@ -225,6 +225,92 @@ Deleted: sha256:3943af3b0cbde0bb8da4e4eb5e81efefe52669e9233eeff0ba820ac838121f65
 
 ![image](../_docs/assets/week-1/frontend-react-js-docker-build-test.png)
 
+#### 1.2.3. Docker-compose
+
+- Created a [docker-compose.yml](../docker-compose.yml)
+
+```yaml
+version: "3.8"
+
+services:
+  backend-flask:
+    environment:
+      FRONTEND_URL: "https://3000-${GITPOD_WORKSPACE_ID}.${GITPOD_WORKSPACE_CLUSTER_HOST}"
+      BACKEND_URL: "https://4567-${GITPOD_WORKSPACE_ID}.${GITPOD_WORKSPACE_CLUSTER_HOST}"
+    build: ./backend-flask
+    ports:
+      - "4567:4567"
+    volumes:
+      - ./backend-flask:/backend-flask
+
+  frontend-react-js:
+    environment:
+      REACT_APP_BACKEND_URL: "https://4567-${GITPOD_WORKSPACE_ID}.${GITPOD_WORKSPACE_CLUSTER_HOST}"
+    build: ./frontend-react-js
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend-react-js:/frontend-react-js
+
+# the name flag is a hack to change the default prepend folder
+# name when outputting the image names
+networks: 
+  internal-network:
+    driver: bridge
+    name: cruddur
+```
+
+- Tests
+
+![image](../_docs/assets/week-1/docker-compose-up-gitpod.png)
+![image](../_docs/assets/week-1/docker-compose-up.png)
+
+```shell
+gitpod /workspace/aws-bootcamp-cruddur-2023 (main) $ curl -X GET https://4567-vlgermanov-awsbootcampc-hsq3j8x77fq.ws-eu88.gitpod.io/api/activities/home -H "Accept: application/json" -H "Content-Type: application/json"
+[
+  {
+    "created_at": "2023-02-23T21:15:56.577144+00:00",
+    "expires_at": "2023-03-02T21:15:56.577144+00:00",
+    "handle": "Andrew Brown",
+    "likes_count": 5,
+    "message": "Cloud is fun!",
+    "replies": [
+      {
+        "created_at": "2023-02-23T21:15:56.577144+00:00",
+        "handle": "Worf",
+        "likes_count": 0,
+        "message": "This post has no honor!",
+        "replies_count": 0,
+        "reply_to_activity_uuid": "68f126b0-1ceb-4a33-88be-d90fa7109eee",
+        "reposts_count": 0,
+        "uuid": "26e12864-1c26-5c3a-9658-97a10f8fea67"
+      }
+    ],
+    "replies_count": 1,
+    "reposts_count": 0,
+    "uuid": "68f126b0-1ceb-4a33-88be-d90fa7109eee"
+  },
+  {
+    "created_at": "2023-02-18T21:15:56.577144+00:00",
+    "expires_at": "2023-03-06T21:15:56.577144+00:00",
+    "handle": "Worf",
+    "likes": 0,
+    "message": "I am out of prune juice",
+    "replies": [],
+    "uuid": "66e12864-8c26-4c3a-9658-95a10f8fea67"
+  },
+  {
+    "created_at": "2023-02-25T20:15:56.577144+00:00",
+    "expires_at": "2023-02-26T09:15:56.577144+00:00",
+    "handle": "Garek",
+    "likes": 0,
+    "message": "My dear doctor, I am just simple tailor",
+    "replies": [],
+    "uuid": "248959df-3079-4947-b847-9e0892d1bab4"
+  }
+]
+```
+
 ### 1.3. Notifications functionality in the applications
 
 ### 1.4. Run locally DB containers
