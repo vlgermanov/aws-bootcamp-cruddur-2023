@@ -383,7 +383,7 @@ Add a new route:
 
 #### 1.4.1. DynamoDB Local Container
 
-- Modify the [docker-compose.yml](../docker-compose.yml) file to add the following service
+- Modify the [docker-compose.yml](../docker-compose.yml) file to add the following service section
 
 ```yaml
 services:
@@ -401,7 +401,7 @@ services:
     working_dir: /home/dynamodblocal
 ```
 
-- Modify the [docker-compose.yml](../docker-compose.yml) file to add the following service
+- Modify the [docker-compose.yml](../docker-compose.yml) file to add the following volume section
 
 ```yaml
 volumes:
@@ -422,6 +422,59 @@ gitpod /workspace/aws-bootcamp-cruddur-2023 (main) $ aws dynamodb list-tables --
 ```
 
 ![image](../_docs/assets/week-1/dynamodb-local.png)
+
+#### 1.4.2. Postgres Container
+
+- Modify the [docker-compose.yml](../docker-compose.yml) file to add the following service section
+
+```yaml
+services:
+  db:
+    image: postgres:13-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgresdb:/var/lib/postgresql/data
+```
+
+- Modify the [docker-compose.yml](../docker-compose.yml) file to add the following volume section
+
+```yaml
+volumes:
+  postgresdb:
+    driver: local
+```
+
+- Testing connectivity to Postgres container
+
+```shell
+gitpod /workspace/aws-bootcamp-cruddur-2023 (main) $ docker-compose ps
+NAME                             IMAGE                COMMAND                  SERVICE             CREATED             STATUS              PORTS
+aws-bootcamp-cruddur-2023-db-1   postgres:13-alpine   "docker-entrypoint.s…"   db                  3 minutes ago       Up 3 minutes        0.0.0.0:5432->5432/tcp, :::5432->5432/tcp
+gitpod /workspace/aws-bootcamp-cruddur-2023 (main) $ psql -h localhost -p 5432 -U postgres
+Password for user postgres: 
+psql (13.10 (Ubuntu 13.10-1.pgdg20.04+1))
+Type "help" for help.
+
+postgres=# \l
+                                 List of databases
+   Name    |  Owner   | Encoding |  Collate   |   Ctype    |   Access privileges   
+-----------+----------+----------+------------+------------+-----------------------
+ postgres  | postgres | UTF8     | en_US.utf8 | en_US.utf8 | 
+ template0 | postgres | UTF8     | en_US.utf8 | en_US.utf8 | =c/postgres          +
+           |          |          |            |            | postgres=CTc/postgres
+ template1 | postgres | UTF8     | en_US.utf8 | en_US.utf8 | =c/postgres          +
+           |          |          |            |            | postgres=CTc/postgres
+(3 rows)
+
+postgres=# \q
+```
+
+![image](../_docs/assets/week-1/postgres-local.png)
 
 ## 2. Stretched Homework
 
