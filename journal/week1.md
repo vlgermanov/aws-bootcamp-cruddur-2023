@@ -354,6 +354,27 @@ def data_notifications():
   return data, 200
 ```
 
+#### 1.3.3. Frontend-react-js notifications endpoint
+
+- Created a [NotificationsFeedPage.css](../frontend-react-js/src/pages/NotificationsFeedPage.css) file
+- Created a [NotificationsFeedPage.js](../frontend-react-js/src/pages/NotificationsFeedPage.js) file
+- Modified the [App.js](../frontend-react-js/src/App.js) file
+
+Add a new import:
+
+```js
+import NotificationsFeedPage from './pages/NotificationsFeedPage';
+```
+
+Add a new route:
+
+```js
+  {
+    path: "/notifications",
+    element: <NotificationsFeedPage />
+  },
+```
+
 ### 1.4. Run locally DB containers
 
 ## 2. Stretched Homework
