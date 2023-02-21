@@ -409,6 +409,10 @@ volumes:
     driver: local
 ```
 
+> **Note:**
+> I used named volume for the dynamodb local container - with this approach it is not needed to
+> exclude `./docker/dynamodb` directory with `.gitignore` file
+
 - Testing connectivity to DynamoDB Local container
 
 ```shell
