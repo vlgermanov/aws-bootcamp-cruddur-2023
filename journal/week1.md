@@ -334,6 +334,26 @@ gitpod /workspace/aws-bootcamp-cruddur-2023 (main) $ curl -X GET https://4567-vl
                   $ref: '#/components/schemas/Activity'
 ```
 
+#### 1.3.2. Backend-flask notifications endpoint
+
+- Created a [notifications_activities.py](../backend-flask/services/notifications_activities.py) file
+- Modified the [app.py](../backend-flask/app.py) file
+
+Add a new import:
+
+```python
+from services.notifications_activities import *
+```
+
+Add a new route:
+
+```python
+@app.route("/api/activities/notifications", methods=['GET'])
+def data_notifications():
+  data = NotificationsActivities.run()
+  return data, 200
+```
+
 ### 1.4. Run locally DB containers
 
 ## 2. Stretched Homework
