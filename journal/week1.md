@@ -124,6 +124,107 @@ Deleted: sha256:37bbcdab0d7c28d203ad79a2d848fc87a38f843ef2e78e1f330fc554168c6281
 
 ![image](../_docs/assets/week-1/backend-flask-docker-build-test.png)
 
+#### 1.2.2. Frontend-react-js
+
+- Created a [Dockerfile](../frontend-react-js/Dockerfile)
+
+```dockerfile
+FROM node:16.18
+
+ENV PORT=3000
+
+COPY . /frontend-react-js
+WORKDIR /frontend-react-js
+
+RUN npm install
+EXPOSE ${PORT}
+CMD ["npm", "start"]
+```
+
+- Test `docker build`
+
+```shell
+gitpod /workspace/aws-bootcamp-cruddur-2023/frontend-react-js (main) $ docker build -t frontend-react-js:test .
+Sending build context to Docker daemon   1.51MB
+Step 1/7 : FROM node:16.18
+ ---> 993a4cf9c1e8
+Step 2/7 : ENV PORT=3000
+ ---> Running in 4476467b4b92
+Removing intermediate container 4476467b4b92
+ ---> 2d18ea64267a
+Step 3/7 : COPY . /frontend-react-js
+ ---> b53708c7ee54
+Step 4/7 : WORKDIR /frontend-react-js
+ ---> Running in 907e22a3354f
+Removing intermediate container 907e22a3354f
+ ---> 2eb2da7f4eb1
+Step 5/7 : RUN npm install
+ ---> Running in ced0c60237b9
+npm WARN deprecated w3c-hr-time@1.0.2: Use your platform's native performance.now() and performance.timeOrigin.
+npm WARN deprecated stable@0.1.8: Modern JS already guarantees Array#sort() is a stable sort, so this library is deprecated. See the compatibility table on MDN: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort#browser_compatibility
+npm WARN deprecated svgo@1.3.2: This SVGO version is no longer supported. Upgrade to v2.x.x.
+
+added 1471 packages, and audited 1472 packages in 17s
+
+225 packages are looking for funding
+  run `npm fund` for details
+
+8 high severity vulnerabilities
+
+To address issues that do not require attention, run:
+  npm audit fix
+
+To address all issues (including breaking changes), run:
+  npm audit fix --force
+
+Run `npm audit` for details.
+npm notice 
+npm notice New major version of npm available! 8.19.2 -> 9.5.1
+npm notice Changelog: <https://github.com/npm/cli/releases/tag/v9.5.1>
+npm notice Run `npm install -g npm@9.5.1` to update!
+npm notice 
+Removing intermediate container ced0c60237b9
+ ---> 30f699aa9691
+Step 6/7 : EXPOSE ${PORT}
+ ---> Running in 734e975763e6
+Removing intermediate container 734e975763e6
+ ---> aa0d6276c77e
+Step 7/7 : CMD ["npm", "start"]
+ ---> Running in f10e94b815f9
+Removing intermediate container f10e94b815f9
+ ---> e7c53d2f47ff
+Successfully built e7c53d2f47ff
+Successfully tagged frontend-react-js:test
+gitpod /workspace/aws-bootcamp-cruddur-2023/frontend-react-js (main) $ docker image ls
+REPOSITORY          TAG       IMAGE ID       CREATED          SIZE
+frontend-react-js   test      e7c53d2f47ff   35 seconds ago   1.19GB
+node                16.18     993a4cf9c1e8   2 months ago     910MB
+gitpod /workspace/aws-bootcamp-cruddur-2023/frontend-react-js (main) $ docker rmi frontend-react-js:test node:16.18 
+Untagged: frontend-react-js:test
+Deleted: sha256:e7c53d2f47ff4975777e6a215de063fa7a41d7a69d495041a1439c9779551dd2
+Deleted: sha256:aa0d6276c77e01bd54fe4af4976f625b433e1a1f46799f06da46890b91b224fd
+Deleted: sha256:30f699aa969166c5bdbad0fd3c3dc0707cba41ff8e1a31b8ed8b4c32b05d9d19
+Deleted: sha256:1566f243ad64aac48d1426beac0df7d6d0c76ec2f0e5d19f04513a87e6879802
+Deleted: sha256:2eb2da7f4eb15b55daef925dcc761ddd254255148a9f5d7588f972cd586dafd4
+Deleted: sha256:b53708c7ee54f57762ef6e62435f9e1db367e00949946f338adb279ed97a9420
+Deleted: sha256:ddefc03c829a8d8d6ac0f56af0879bd75b37846035c0236cc4429fcfd5e785b7
+Deleted: sha256:2d18ea64267a38df7b3b8111ee7be46e436a218e62903621b34a054549054c4f
+Untagged: node:16.18
+Untagged: node@sha256:7f404d09ceb780c51f4fac7592c46b8f21211474aacce25389eb0df06aaa7472
+Deleted: sha256:993a4cf9c1e80aa74567d3deea4dfa1488b94dcb024bfca9246f979845763509
+Deleted: sha256:138a8239558b46fe6b960dcc9c40bdd108fe475b336d26c9bdc64a556989a2ac
+Deleted: sha256:f21c65291da9a2e5d1333a6f9b65587c218fc766fd5c1e106165bd789fce72f8
+Deleted: sha256:144e8cf2307d3547c00d0db36e55685deeb8574424773106eac5a9761977f017
+Deleted: sha256:ac9975a42cd57dec25c63387428c6f46f16008062003ee67dad658c3cfa3d33a
+Deleted: sha256:8ccfb73d7f0b7964f0687fe1d2862ef21ca78724bd470b4a52992d235409e484
+Deleted: sha256:0108b6ee43459e7cc63f0857c157b3a100d5f844c50aa6cdaf97e5076e85a311
+Deleted: sha256:a149f77f0d467a0aedf6bc5fe1e7514508df7e2f2108833801542ac143f7d140
+Deleted: sha256:1c07cfa520c183a58e72eba5f438f7d00f8c50f97f55ca6ad1842e4649151e48
+Deleted: sha256:3943af3b0cbde0bb8da4e4eb5e81efefe52669e9233eeff0ba820ac838121f65
+```
+
+![image](../_docs/assets/week-1/frontend-react-js-docker-build-test.png)
+
 ### 1.3. Notifications functionality in the applications
 
 ### 1.4. Run locally DB containers
