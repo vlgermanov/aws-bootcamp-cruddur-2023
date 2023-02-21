@@ -313,6 +313,27 @@ gitpod /workspace/aws-bootcamp-cruddur-2023 (main) $ curl -X GET https://4567-vl
 
 ### 1.3. Notifications functionality in the applications
 
+#### 1.3.1. Document the Notification Endpoint for the OpenAI Document
+
+- Add the following to the `paths:` section in the [openapi-3.0.yml](../backend-flask/openapi-3.0.yml) file
+
+```yaml
+  /api/activities/notifications:
+    get:
+      description: 'Return a feed of activity for all of those that I follow'
+      tags:
+        - activities
+      responses:
+        '200':
+          description: Returns an array of activities"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Activity'
+```
+
 ### 1.4. Run locally DB containers
 
 ## 2. Stretched Homework
