@@ -375,6 +375,10 @@ Add a new route:
   },
 ```
 
+#### 1.3.4. Testing notifications endpoint
+
+![image](../_docs/assets/week-1/notifications-endpoint.png)
+
 ### 1.4. Run locally DB containers
 
 ## 2. Stretched Homework
