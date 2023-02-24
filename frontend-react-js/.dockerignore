@@ -1,0 +1,13 @@
+**/.git
+**/.gitignore
+**/.dockerignore
+**/.vscode
+**/coverage
+**/.env
+**/.aws
+**/.ssh
+Dockerfile*
+README.md
+docker-compose*.yml
+node_modules
+npm-debug.log

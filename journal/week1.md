@@ -720,6 +720,50 @@ Add extra environment variable to backend-flash service:
 
 #### 2.2.2. Frontend-react-js
 
+- Created a [Dockerfile.prod](../frontend-react-js/Dockerfile.prod)
+
+```dockerfile
+FROM node:16.18 AS build
+RUN apt-get update && apt-get install -y --no-install-recommends dumb-init
+WORKDIR /usr/src/app
+COPY package*.json /usr/src/app/
+RUN npm ci --only=production
+
+FROM node:16.18.0-bullseye-slim@sha256:5c9f79e11b4f867582241b5e7db96bbe1893fad8c1f523261690c743d0950667
+
+ENV NODE_ENV production
+ENV PORT=3000
+COPY --from=build /usr/bin/dumb-init /usr/bin/dumb-init
+USER node
+WORKDIR /usr/src/app
+COPY --chown=node:node --from=build /usr/src/app/node_modules /usr/src/app/node_modules
+COPY --chown=node:node . /usr/src/app
+
+EXPOSE ${PORT}
+ENTRYPOINT ["dumb-init"]
+CMD [ "npm", "start" ]
+```
+
+- Created a [.dockerignore](../frontend-react-js/.dockerignore) file
+
+```text
+**/.git
+**/.gitignore
+**/.dockerignore
+**/.vscode
+**/coverage
+**/.env
+**/.aws
+**/.ssh
+Dockerfile*
+README.md
+docker-compose*.yml
+node_modules
+npm-debug.log
+```
+
+#### 2.2.3. Testing
+
 ### 2.3. Build and publish container's images to DockerHub
 
 ### 2.4. Implement a `health check` in the docker-compose file
