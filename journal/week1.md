@@ -482,14 +482,248 @@ postgres=# \q
 
 ## 2. Stretched Homework
 
-### 2.1. Build and publish container's images to DockerHub
+### 2.1. Research best practices of `Dockerfile(s)`
 
-### 2.2. Multi-stage builds for container images
+- Create a `.dockerignore` file to exclude files not relevant to the build of the container image
 
-### 2.3. Implement a `health check` in the docker-compose file
+Example:
 
-### 2.4. Install docker on my local machine and run the applications locally
+```text
+**/.git
+**/.gitignore
+**/.dockerignore
+**/.vscode
+**/coverage
+**/.env
+**/.aws
+**/.ssh
+Dockerfile*
+README.md
+docker-compose.yml
+**/.DS_Store
+**/venv
+**/env
+```
 
-### 2.5. Launch an EC2 instance with docker installed and lunch the apps there
+- Add a `LABEL` instruction(s) in the `Dockerfile`
 
-### 2.6. Best practices of `Dockerfiles`
+Example:
+
+```dockerfile
+# Set one or more individual labels
+LABEL com.example.version="0.0.1-beta"
+LABEL vendor1="ACME Incorporated"
+LABEL com.example.release-date="2023-02-24"
+LABEL com.example.version.is-production=""
+```
+
+- Use explicit and deterministic Docker base image tags
+  - Choose the minimum base image that meets all your requirements, and then build on top of that. Smaller images contain fewer vulnerabilities, are less resource intensive, and have fewer unnecessary packages
+  - Using the named tag isn’t enough to ensure that you will always use the same base image. The only way of ensuring this is by using the image digest
+
+How to find the `digest` of a container image?
+
+```shell
+$ docker images --digests 
+REPOSITORY          TAG                   DIGEST                                                                    IMAGE ID       CREATED        SIZE
+python              3.10-slim-buster      sha256:c059afb019e7aea99777e54b3e0ff8c970ef552b737fb4acbd842916c751fcfd   934047247b20   25 hours ago   118MB
+python              3.10.10-slim-buster   sha256:c059afb019e7aea99777e54b3e0ff8c970ef552b737fb4acbd842916c751fcfd   934047247b20   25 hours ago   118MB
+```
+
+Example:
+
+```dockerfile
+FROM python:3.10-slim-buster@sha256:c059afb019e7aea99777e54b3e0ff8c970ef552b737fb4acbd842916c751fcfd
+```
+
+- Use multi-stage builds
+
+Multi-stage building means that we use a Docker image with more tools for compiling those required dependencies, and afterwards we just copy the artifacts needed to the actual Docker image that gets used. Multi-stage builds are a great way to move from a simple, yet potentially erroneous `Dockerfile`, into separated steps of building a Docker image, so we can avoid leaking sensitive information. Not only that, but we can also use a bigger Docker base image to install our dependencies, compile any native packages if needed, and then copy all these artifacts into a small production base image.
+
+Example:
+
+```dockerfile
+FROM node:latest AS build
+ARG NPM_TOKEN
+WORKDIR /usr/src/app
+COPY package*.json /usr/src/app/
+RUN npm install
+
+
+FROM node:lts-alpine@sha256:b2da3316acdc2bec442190a1fe10dc094e7ba4121d029cb32075ff59bb27390a
+WORKDIR /usr/src/app
+COPY --from=build /usr/src/app/node_modules /usr/src/app/node_modules
+COPY . .
+CMD ["node", "server.js"]
+```
+
+- Don't run containers as `root` user
+
+The principle of least privilege is a security principle from the early days of Unix and we should always follow this when we’re running our containerized applications.
+
+The threat assessment is pretty straight-forward, if an attacker is able to compromise the application in a way that allows for command injection or directory path traversal, then these will be invoked with the user who owns the application process. If that process happens to be `root` then they can do virtually everything within the container, including attempting a container escape or privilege escalation.
+
+Example:
+
+```dockerfile
+FROM node:16.17.0-bullseye-slim
+ENV NODE_ENV production
+WORKDIR /usr/src/app
+COPY --chown=node:node . /usr/src/app
+RUN npm ci --only=production
+USER node
+CMD "npm" "start"
+```
+
+- Find and fix security vulnerabilities in your container images
+
+Use tools like `snyk`, `clair` or `trivy` to scan the container images and detect vulnerabilities.
+
+- Optimize for Production usage
+
+Based on the technology used to build the application, there can be different tools/methods to optimize the container
+image for production usage
+
+Example(s) for python flask:
+
+1. Disable any debug flags
+
+```python
+app.run(debug=False)
+```
+
+2. Disable any development/testing flags
+
+```dockerfile
+ENV FLASK_ENV=development
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+```
+
+3. Use Python WSGI for production
+
+- `gunicorn`
+- `uWSGI`
+- `CherryPy`
+- `mod_wsgi`
+
+Example(s) for node js:
+
+1. Install only production dependencies in the Node.js Docker image
+
+```dockerfile
+RUN npm ci --only=production
+```
+
+2. Optimize Node.js tooling for production
+
+```dockerfile
+ENV NODE_ENV production
+```
+
+### 2.2. Implement best practices of `Dockerfile(s)` in CRUDDUR application (based on the research done in section 2.1)
+
+#### 2.2.1. Backend-flask
+
+- Created a [Dockerfile.prod](../backend-flask/Dockerfile.prod)
+
+```dockerfile
+FROM python:3.10-slim-buster as build
+
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+build-essential gcc
+
+WORKDIR /usr/app
+RUN python -m venv /usr/app/venv
+ENV PATH="/usr/app/venv/bin:$PATH"
+
+COPY requirements.txt .
+RUN pip install -U pip setuptools && pip install -r requirements.txt
+
+
+FROM python:3.10-slim-buster@sha256:c059afb019e7aea99777e54b3e0ff8c970ef552b737fb4acbd842916c751fcfd
+
+RUN groupadd -g 999 -r app && \
+    useradd -M -s /bin/false -r -u 999 -g app app
+
+RUN mkdir /usr/app && chown app:app /usr/app
+WORKDIR /usr/app
+
+COPY --chown=app:app --from=build /usr/app/venv ./venv
+
+COPY --chown=app:app . .
+
+EXPOSE 4567
+
+USER 999
+
+ENV PATH="/usr/app/venv/bin:$PATH"
+
+#CMD [ "python3", "-m" , "flask", "run", "--host=0.0.0.0", "--port=4567"]
+ENTRYPOINT ["gunicorn"]
+CMD [ "--bind", "0.0.0.0:4567", "app:app" ]
+```
+
+- Created a [.dockerignore](../backend-flask/.dockerignore) file
+
+```text
+**/.git
+**/.gitignore
+**/.dockerignore
+**/.vscode
+**/coverage
+**/.env
+**/.aws
+**/.ssh
+Dockerfile*
+README.md
+docker-compose*.yml
+**/.DS_Store
+**/venv
+**/env
+__pycache__/
+```
+
+- Modified the [app.py](../backend-flask/app.py) file
+
+Add a new line:
+
+```python
+debug = os.getenv('DEBUG_APP', False)
+```
+
+Modify:
+
+```python
+  app.run(debug=debug)
+```
+
+- Modify the [docker-compose.yml](../docker-compose.yml) file
+
+Add extra environment variable to backend-flash service:
+
+```yaml
+  backend-flask:
+    environment:
+      FRONTEND_URL: "https://3000-${GITPOD_WORKSPACE_ID}.${GITPOD_WORKSPACE_CLUSTER_HOST}"
+      BACKEND_URL: "https://4567-${GITPOD_WORKSPACE_ID}.${GITPOD_WORKSPACE_CLUSTER_HOST}"
+      DEBUG_APP: True
+    build: ./backend-flask
+    ports:
+      - "4567:4567"
+    volumes:
+      - ./backend-flask:/backend-flask
+```
+
+#### 2.2.2. Frontend-react-js
+
+### 2.3. Build and publish container's images to DockerHub
+
+### 2.4. Implement a `health check` in the docker-compose file
+
+### 2.5. Install docker on my local machine and run the applications locally
+
+### 2.6. Launch an EC2 instance with docker installed and lunch the apps there

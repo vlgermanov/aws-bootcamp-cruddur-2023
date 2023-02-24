@@ -17,6 +17,7 @@ from services.show_activity import *
 app = Flask(__name__)
 frontend = os.getenv('FRONTEND_URL')
 backend = os.getenv('BACKEND_URL')
+debug = os.getenv('DEBUG_APP', False)
 origins = [frontend, backend]
 cors = CORS(
   app,
@@ -120,4 +121,4 @@ def data_activities_reply(activity_uuid):
   return
 
 if __name__ == "__main__":
-  app.run(debug=True)
+  app.run(debug=debug)
