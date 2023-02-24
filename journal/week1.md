@@ -1365,8 +1365,15 @@ CONTAINER ID   IMAGE           COMMAND                  CREATED          STATUS 
 
 ### 2.3. Build and publish container's images to DockerHub
 
-### 2.4. Implement a `health check` in the docker-compose file
+- Created and exported `DOCKER_USERNAME` and `DOCKER_PASSWORD` variables. Add them to `GitPod` variables via `gp env` command.
+- `Retag` generated `prod` container images and push them to DockerHub
 
-### 2.5. Install docker on my local machine and run the applications locally
+![image](../_docs/assets/week-1/push-images-to-dockerhub.png)
+![image](../_docs/assets/week-1/dockerhub.png)
 
-### 2.6. Launch an EC2 instance with docker installed and lunch the apps there
+- Add extra task in [.gitpod.yml](../.gitpod.yml) to initialize docker login
+
+```yaml
+  - name: docker-login
+    command: echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
+```

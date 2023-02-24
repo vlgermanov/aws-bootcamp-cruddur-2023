@@ -8,6 +8,8 @@ tasks:
       unzip awscliv2.zip
       sudo ./aws/install
       cd $THEIA_WORKSPACE_ROOT
+  - name: docker-login
+    command: echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
   - name: Install required linux packages
     command: sudo apt-get install gettext-base -y
 
