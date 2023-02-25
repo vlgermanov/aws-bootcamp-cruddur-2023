@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+apt-get update && NEEDRESTART_MODE=l DEBIAN_FRONTEND=noninteractive apt-get upgrade -y
+
+NEEDRESTART_MODE=l DEBIAN_FRONTEND=noninteractive apt-get install docker.io -y
+systemctl enable --now docker
+usermod -a -G docker ubuntu

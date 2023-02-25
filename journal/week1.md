@@ -1479,3 +1479,64 @@ vlgermanov/cruddur-app-frontend-prod:latest
 ```
 
 ![image](../_docs/assets/week-1/run-images-locally.png)
+
+### 2.5. Launch an EC2 instance with docker installed and lunch the apps there
+
+- Created ssh key-pair and add it as environment variable `SSH_PRIVATE_KEY` in `GitPod`
+
+```shell
+aws ec2 create-key-pair \
+    --key-name aws-bootcamp-2023-key-pair \
+    --tag-specifications 'ResourceType=key-pair,Tags=[{Key=course_name,Value=aws-bootcamp-2023}]' \
+    --query 'KeyMaterial' \
+    --output text > aws-bootcamp-2023-key-pair.pem
+
+
+SSH_PRIVATE_KEY=$(base64 aws-bootcamp-2023-key-pair.pem | tr -d "\n")
+gp env SSH_PRIVATE_KEY="$SSH_PRIVATE_KEY"
+eval $(gp env -e)
+```
+
+- Updated [.gitpod.yml](../.gitpod.yml) to create the ssh key via the environment variable `SSH_PRIVATE_KEY` when `GitPod` workspace is starting
+
+```text
+tasks:
+  - name: add-ssh-key
+    command: echo -n "$SSH_PRIVATE_KEY" | base64 -d > ~/.ssh/id_rsa && chmod 0400 ~/.ssh/id_rsa
+```
+
+- Created a script [launch_ec2.sh](../aws/scripts/launch_ec2.sh) which will launch EC2 instance with `Ubuntu Server 22.04` via `aws ec2 run-instances` and install automatically the `Docker Engine` by `--user-data` [option](../aws/scripts/user-data.txt)
+
+![image](../_docs/assets/week-1/ec2-launch-gitpod-01.png)
+![image](../_docs/assets/week-1/ec2-launch-gitpod-02.png)
+![image](../_docs/assets/week-1/ec2-launch-gitpod-03.png)
+![image](../_docs/assets/week-1/ec2-launch-aws-console.png)
+
+- Started containers for the `frontend` and `backend` via
+
+```shell
+# backend
+docker run \
+-d \
+--rm \
+--name backend_flask \
+-p 4567:4567 \
+-e FRONTEND_URL="http://ec2-3-76-207-198.eu-central-1.compute.amazonaws.com:3000" \
+-e BACKEND_URL="http://ec2-3-76-207-198.eu-central-1.compute.amazonaws.com:4567" \
+-e DEBUG_APP=False \
+vlgermanov/cruddur-app-backend-prod:latest
+#frontend
+docker run \
+-d \
+--rm \
+--name frontend_react_js \
+-p 3000:3000 \
+-e REACT_APP_BACKEND_URL="http://ec2-3-76-207-198.eu-central-1.compute.amazonaws.com:4567" \
+vlgermanov/cruddur-app-frontend-prod:latest
+```
+
+![image](../_docs/assets/week-1/ec2-launch-gitpod-04.png)
+
+- Load the `frontend`
+
+![image](../_docs/assets/week-1/ec2-cruddur.png)

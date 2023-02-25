@@ -12,6 +12,8 @@ tasks:
     command: echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
   - name: Install required linux packages
     command: sudo apt-get install gettext-base -y
+  - name: add-ssh-key
+    command: echo -n "$SSH_PRIVATE_KEY" | base64 -d > ~/.ssh/id_rsa && chmod 0400 ~/.ssh/id_rsa
 
 vscode:
   extensions:
